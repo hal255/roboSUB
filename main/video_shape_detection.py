@@ -18,9 +18,17 @@ contour_index = -1   # -1 to draw all contours
 contour_thickness = 1   # -1 to fill in shape, integer values only
 camera = cv2.VideoCapture(camera_value)
 
-first_param = 127        # first param for finding optimal thresh 
-second_param = 255       # second param for finding optimal thresh 
-third_param = cv2.THRESH_BINARY_INV        # third param for finding optimal thresh 
+'''
+optimal setting to see paper
+first_param = 194
+second_param = 255
+third_param = 0
+approx_value = 0.01
+'''
+first_param = 194       # first param for finding optimal thresh
+second_param = 255      # second param for finding optimal thresh, minimum 1 to see
+third_param = 0         # third param for finding optimal thresh (from 0-5)
+approx_value = 0.01     # arc_length multiplier to determine contour, smaller for more precision
 
 while True:
     if debug_mode:
@@ -47,7 +55,8 @@ while True:
     #contours, h = cv2.findContours(thresh,1,2)
     
     for cnt in contours:
-        approx = cv2.approxPolyDP(cnt,0.01*cv2.arcLength(cnt,True),True)
+        approx = cv2.approxPolyDP(cnt,approx_value*cv2.arcLength(cnt,True),True)
+        #approx = cv2.approxPolyDP(cnt,0.01*cv2.arcLength(cnt,True),True)
         if debug_mode:
             print len(approx)
         if len(approx)==3:
@@ -136,8 +145,23 @@ while True:
             third_param = 0
         print "third param=", third_param
 
+    # if button 9 is pressed, increment approx value by 0.01
+    if k == 57:
+        approx_value += 0.01
+        print "approx_value=", approx_value
+
+    # if button o is pressed, decrement approx value by 0.01
+    if k == 111:
+        approx_value -= 0.01
+        if approx_value < 0.01:
+            approx_value = 0.01
+        print "approx_value=", approx_value
+
     # print parameters
-    print first_param, second_param, third_param
+    print "intensity=",first_param
+    print "max_value=",second_param
+    print "Threshold Setting=",third_param
+    print "approx_value=", approx_value
     
     
     '''
